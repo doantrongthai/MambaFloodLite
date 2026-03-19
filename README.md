@@ -40,7 +40,7 @@ Training pipeline for flood area segmentation with strict reproducibility using 
 git clone https://github.com/doantrongthai/MambaFloodLite
 cd MambaFloodLite
 
-pip install torch torchvision albumentations opencv-python tqdm gdown numpy pillow
+pip install -r requirements.txt
 ```
 
 ---
@@ -48,16 +48,15 @@ pip install torch torchvision albumentations opencv-python tqdm gdown numpy pill
 ## Quick Start
 
 ```bash
-# Download dataset
-python main.py --download
 
 # Train MambaFloodLite
-python main.py \
-  --model mambaunet \
+python benchmark.py \
+  --model model \
   --epochs 50 \
   --batch_size 4 \
   --lr 0.001 \
-  --seed 42
+  --seed 42 \
+  --download
 ```
 
 ---
@@ -67,14 +66,14 @@ python main.py \
 ### Basic Training
 
 ```bash
-python main.py --model mambaunet --epochs 50
+python benchmark.py --model model --epochs 50
 ```
 
 ### All Options
 
 ```bash
-python main.py \
-  --model mambaunet \
+python benchmark.py \
+  --model model \
   --size 256 \
   --epochs 50 \
   --batch_size 4 \
@@ -85,7 +84,7 @@ python main.py \
 
 | Argument | Default | Description |
 |---|---|---|
-| `--model` | required | Model name (e.g. `mambaunet`, `unet`, `segformer`) |
+| `--model` | required | Model name (e.g. `model`, `unet`, `segformer`) |
 | `--size` | `256` | Input image size |
 | `--epochs` | `50` | Number of training epochs |
 | `--batch_size` | `4` | Batch size |
@@ -104,10 +103,10 @@ Each experiment is repeated across 5 independent random seeds to ensure statisti
 
 ```bash
 # Default seeds: 42, 123, 456, 789, 2024
-python main.py --model mambaunet --multiseed --epochs 50
+python benchmark.py --model model --multiseed --epochs 50
 
 # Custom seeds
-python main.py --model mambaunet --multiseed --seeds 42 100 200 300 400 --epochs 50
+python benchmark.py --model model --multiseed --seeds 42 123 456 789 2024 --epochs 50
 ```
 
 **Output:**
@@ -147,28 +146,3 @@ Results saved to: `outputs/{model}_floodkaggle_multiseed.json`
 | Attention U-Net | 34,878,573 | 0.6805 ± 0.0208 | 0.8097 ± 0.0148 |
 
 ---
-
-## Reproducibility
-
-- Fixed seeds for Python, NumPy, PyTorch, CUDA
-- Deterministic CUDA operations (`torch.use_deterministic_algorithms(True)`)
-- Disabled cuDNN benchmark and TF32
-- Per-sample deterministic augmentation
-- Fixed DataLoader worker seeds
-- RNG states saved in checkpoints
-
----
-
-## Troubleshooting
-
-**CUDA out of memory**
-```
-RuntimeError: CUDA out of memory
-```
-Reduce batch size: `--batch_size 2`
-
-**Dataset not found**
-```
-FileNotFoundError: floodkaggle not found
-```
-Run with `--download` flag first.
